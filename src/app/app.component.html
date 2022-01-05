@@ -1,4 +1,30 @@
 <div class="page">
-  <div class="header">Angular sample</div>
-  <div #viewer class="viewer"></div>
+  <div class="header">PDF Compare
+    <button (click)="onClickDocOne()">
+      Doc One
+    </button>
+    <input type="file" #openDocOne id="openDocOne" name="openDocOne" accept="pdf" style="display:none;" />
+    <button (click)="onClickDocTwo()">
+      Doc Two
+    </button>
+    <input type="file" #openDocTwo id="openDocTwo" name="openDocTwo" accept="pdf" style="display:none;" />
+    <button (click)="onClickCompare()">
+      Compare
+    </button>
+  </div>
+  <as-split direction="vertical">
+    <as-split-area [size]="50" [minSize]="minSize">
+      <as-split direction="horizontal">
+        <as-split-area [size]="50" style="overflow:auto">
+          <div #viewer1 class="viewer"></div>
+        </as-split-area>
+        <as-split-area [size]="50" style="overflow:auto">
+          <div #viewer2 class="viewer"></div>
+        </as-split-area>
+      </as-split>
+    </as-split-area>
+    <as-split-area [size]="50" style="align-content:center; overflow:auto">
+      <div #viewer3 class="viewer"></div>
+    </as-split-area>
+  </as-split>
 </div>
