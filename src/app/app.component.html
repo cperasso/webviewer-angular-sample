@@ -1,14 +1,14 @@
 <div class="page">
   <div class="header">PDF Compare
-    <button (click)="onClickDocOne()">
-      Doc One
+    <button mat-button (click)="onClickDocOne()">
+      Document One
     </button>
-    <input type="file" #openDocOne id="openDocOne" name="openDocOne" accept="pdf" style="display:none;" />
-    <button (click)="onClickDocTwo()">
-      Doc Two
+    <input type="file" #openDocOne id="openDocOne" name="openDocOne" accept=".pdf" style="display:none;" />
+    <button mat-button (click)="onClickDocTwo()">
+      Document Two
     </button>
-    <input type="file" #openDocTwo id="openDocTwo" name="openDocTwo" accept="pdf" style="display:none;" />
-    <button (click)="onClickCompare()">
+    <input type="file" #openDocTwo id="openDocTwo" name="openDocTwo" accept=".pdf" style="display:none;" />
+    <button mat-button (click)="onClickCompare()">
       Compare
     </button>
   </div>

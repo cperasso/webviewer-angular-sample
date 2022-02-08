@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AngularSplitModule } from 'angular-split';
+import {MatButtonModule} from '@angular/material/button';
 
 import { AppComponent } from './app.component';
 
@@ -10,6 +11,7 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
+    MatButtonModule,
     AngularSplitModule.forRoot(),
   ],
   exports: [

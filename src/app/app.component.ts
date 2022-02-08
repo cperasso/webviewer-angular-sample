@@ -21,6 +21,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   @Output() coreControlsEvent:EventEmitter<string> = new EventEmitter(); 
   public doc1: Core.PDFNet.PDFDoc;
   public doc2: Core.PDFNet.PDFDoc;
+  public doc1Buffer: any;
+  public doc2Buffer: any;
   public minSize;
 
   private documentLoaded$: Subject<void>;
@@ -34,30 +36,25 @@ export class AppComponent implements OnInit, AfterViewInit {
   
     WebViewer({
       path: '../lib',
-      fullAPI: true
+      enableAnnotations: false
     }, this.viewer1.nativeElement).then(async instance1 => {
       this.wvInstance1 = instance1;
-      instance1.UI.disableElements(['ribbons', 'leftPanelButton']);
+      instance1.UI.disableElements(['ribbons', 'leftPanelButton', 'viewControlsButton', 'notesPanelButton','downloadButton']);
       this.coreControlsEvent.emit(instance1.UI.LayoutMode.Single);
-      const { PDFNet, documentViewer } = instance1.Core;
+      const { PDFNet } = instance1.Core;
       await PDFNet.initialize();
-      documentViewer.addEventListener('documentLoaded', async () => {
-        this.doc1 = await this.wvInstance1.Core.documentViewer.getDocument().getPDFDoc();
-      });
     })
 
     WebViewer({
       path: '../lib',
+      enableAnnotations: false,
       fullAPI: true
     }, this.viewer2.nativeElement).then(async instance2 => {
       this.wvInstance2 = instance2;
-      instance2.UI.disableElements(['ribbons', 'leftPanelButton']);
+      instance2.UI.disableElements(['ribbons', 'leftPanelButton', 'viewControlsButton', 'notesPanelButton','downloadButton']);
       this.coreControlsEvent.emit(instance2.UI.LayoutMode.Single);
-      const { PDFNet, documentViewer } = instance2.Core;
+      const { PDFNet } = instance2.Core;
       await PDFNet.initialize();
-      documentViewer.addEventListener('documentLoaded', async () => {
-        this.doc2 = await this.wvInstance2.Core.documentViewer.getDocument().getPDFDoc();
-      });
     })
 
     WebViewer({
@@ -65,10 +62,15 @@ export class AppComponent implements OnInit, AfterViewInit {
       fullAPI: true
     }, this.viewer3.nativeElement).then(async instance3 => {
       this.wvInstance3 = instance3;
-      instance3.UI.disableElements(['ribbons', 'leftPanelButton']);
+      instance3.UI.disableElements(['ribbons', 'leftPanelButton', 'viewControlsButton']);
       this.coreControlsEvent.emit(instance3.UI.LayoutMode.Single);
-      const { PDFNet } = instance3.Core;
+      const { PDFNet, documentViewer } = instance3.Core;
       await PDFNet.initialize();
+      // wait until the document has been loaded
+      documentViewer.addEventListener('documentLoaded', () => {
+        instance3.UI.openElements(['notesPanel']);
+        this.wvInstance3.UI.setLayoutMode(this.wvInstance3.UI.LayoutMode.FacingContinuous);
+      });
     })
   }
 
@@ -78,6 +80,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   onClickDocOne() {
     const openDocOne = this.openDocOne.nativeElement;openDocOne.onchange = async () => {
       this.wvInstance1.UI.loadDocument(openDocOne.files[0]);
+      this.doc1Buffer = openDocOne.files[0];
     }
     openDocOne.click();
   }
@@ -85,6 +88,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   onClickDocTwo() {
     const openDocTwo = this.openDocTwo.nativeElement;openDocTwo.onchange = async () => {
       this.wvInstance2.UI.loadDocument(openDocTwo.files[0]);
+      this.doc2Buffer = openDocTwo.files[0];
     }
     openDocTwo.click();
   }
@@ -92,11 +96,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   async onClickCompare() {
     const { PDFNet } = this.wvInstance3.Core;
     const newDoc = await PDFNet.PDFDoc.create();
-    await newDoc.lock();
-    await newDoc.appendTextDiffDoc(this.doc1, this.doc2);
-    await newDoc.unlock();
+    const doc1 = await PDFNet.PDFDoc.createFromBuffer(await this.doc1Buffer.arrayBuffer());
+    const doc2 = await PDFNet.PDFDoc.createFromBuffer(await this.doc2Buffer.arrayBuffer());
+    await newDoc.appendTextDiffDoc(doc1, doc2);
     this.wvInstance3.UI.loadDocument(newDoc);
-  }
+}
  
   getDocumentLoadedObservable() {
     return this.documentLoaded$.asObservable();
